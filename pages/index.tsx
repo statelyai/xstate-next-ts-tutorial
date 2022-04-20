@@ -25,27 +25,31 @@ const Home: NextPage = () => {
       <pre>{JSON.stringify(state.value)}</pre>
       <pre>{JSON.stringify(state.context)}</pre>
       <div>
-        {state.context.todos.map((todo) => (
-          <div
-            key={todo}
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <p>{todo}</p>
-            <button
-              onClick={() => {
-                send({
-                  type: "Delete",
-                  todo,
-                });
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+        {state.matches("Todos Loaded") && (
+          <>
+            {state.context.todos.map((todo) => (
+              <div
+                key={todo}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <p>{todo}</p>
+                <button
+                  onClick={() => {
+                    send({
+                      type: "Delete",
+                      todo,
+                    });
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </>
+        )}
         {state.matches("Todos Loaded") && (
           <button
             onClick={() => {
@@ -56,6 +60,20 @@ const Home: NextPage = () => {
           >
             Create new
           </button>
+        )}
+        {state.matches("Deleting todo errored") && (
+          <>
+            <p>Something went wrong: {state.context.errorMessage}</p>
+            <button
+              onClick={() => {
+                send({
+                  type: "Speed up",
+                });
+              }}
+            >
+              Go back to list
+            </button>
+          </>
         )}
         {state.matches("Creating new todo.Showing form input") && (
           <form
