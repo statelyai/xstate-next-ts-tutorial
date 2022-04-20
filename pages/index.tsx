@@ -9,6 +9,7 @@ const Home: NextPage = () => {
   const [state, send] = useMachine(todosMachine, {
     services: {
       loadTodos: async () => {
+        throw new Error("Oh noooooo");
         return ["Take bins out", "Do laundry"];
       },
     },
@@ -16,27 +17,8 @@ const Home: NextPage = () => {
 
   return (
     <div>
-      {JSON.stringify(state.value)}
-      <button
-        onClick={() => {
-          send({
-            type: "Todos loaded",
-            todos: ["Take bins out"],
-          });
-        }}
-      >
-        Todos loaded
-      </button>
-      <button
-        onClick={() => {
-          send({
-            type: "Loading todos failed",
-            errorMessage: "Oh no!",
-          });
-        }}
-      >
-        Loading todos failed
-      </button>
+      <pre>{JSON.stringify(state.value)}</pre>
+      <pre>{JSON.stringify(state.context)}</pre>
     </div>
   );
 };
