@@ -3,26 +3,39 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { myMachine } from "../machines/myFirstMachine";
+import { todosMachine } from "../machines/todoAppMachine";
 
 const Home: NextPage = () => {
-  const [state, send] = useMachine(myMachine);
+  const [state, send] = useMachine(todosMachine, {
+    services: {
+      loadTodos: async () => {
+        return ["Take bins out", "Do laundry"];
+      },
+    },
+  });
 
   return (
     <div>
       {JSON.stringify(state.value)}
       <button
         onClick={() => {
-          send("MOUSEOVER");
+          send({
+            type: "Todos loaded",
+            todos: ["Take bins out"],
+          });
         }}
       >
-        Mouse over
+        Todos loaded
       </button>
       <button
         onClick={() => {
-          send("MOUSEOUT");
+          send({
+            type: "Loading todos failed",
+            errorMessage: "Oh no!",
+          });
         }}
       >
-        Mouse out
+        Loading todos failed
       </button>
     </div>
   );
