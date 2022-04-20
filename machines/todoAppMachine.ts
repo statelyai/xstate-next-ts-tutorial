@@ -1,7 +1,7 @@
 import { createMachine, assign } from "xstate";
 
 export const todosMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBUD2FUAIC2BDAxgBYCWAdmAHQAyquEZUmaGsAxBuRWQG6oDWlZljxEylGnQZN0qWAh6p8uAC7FUpANoAGALqJQAB1nFV6-SAAeiALQBGAMwBWClscA2AJxuA7ACYALI6ODoEANCAAnjb2WrYUbm7+ABy23rZu9v4eSW4AvrnhQjgEJJwS9KSMQmxgAE61qLUUBgA2KgBmjdgURSKl4rQVVTJyCkqmmrrmRrAmaqTmVgjWQVoUvl6Zth72OUneSeFRy472FNu+vt6OO0lXHlf5hTLFopzVmOWQrADCtWAqMCYcgAd2mxgmixs2XiWm8Pk8CV8bmRRxs3m8FHciI8fkc-jcWmyTxAvRKYgofwBqkqwLAIMwyhkFAAyoRUCCpJ1athMGQDABXZSsABiXT5pEFykwRFwlUg4NmkKQlhstl8SQo3nsiTctiSmw8QUcaIQ2w853saUcSSSOuy-nyBRApHQcHMZLeA0ktOqirmZhVSxWNpcWmSyRiCQ8HlNdlxLnstn8WnsmX8ITyzs9-R6I0+gwVKpmAYWQbVVy1iX8GpryN8cP8cf1mu8qfS+MJGNTSRJOYp5SkTJYmDqDX+EH9ytAwcc2ooSRraY8WRjBN8prbFCy9g8cNs2wJ3mSfZefQpVJUUlBjOZbI5XPF-KFU-mUOWbmctsccMSBqSWg+BukSICuFDZDsu5GjqWxZs8GCvLml40owN7Dqgr6BjOaqOL4Wo6gS+qGsapq+HEMaLvibYIgejingh57kJhZbYScCaLr4y6riuKJxla-jxEEnjIjEvhzvCTq5EAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBUD2FUAIC2BDAxgBYCWAdmAHQAyquEZUmaGsAxBuRWQG6oDWlZljxEylGnQZN0qWAh6p8uAC7FUpANoAGALqJQAB1nFV6-SAAeiABzWKAFgDMATgBM1gOyPr9gGy+AVntrABoQAE9EAFpHLWcKAEYA619rAISE30znAF8csKEcAhJOCXpSRiE2MAAnGtQaigMAGxUAMwbsCkKREvFacsqZOQUlU01dcyNYEzVScysEGNdfCmstDc9YtK1bMMil3y0KVKyna2c4+2dfZ3s8gpki0U4qzDLIVgBhGrAVMEw5AA7lNjOMFogEq57GtbAFXAEAh57JtHI59ohYhQPFkMtYEloEvYMgk0g8QD1imIKD8-qoKoCwEDMMoZBQAMqEVBAqQdGrYTBkAwAV2UrAAYp1BaQRcpMERcBVIKCZuCkJZonjEgjnMjfK5dQFdRiEI4UYlvB5SXqPITyZSXpRaSopMCWWzOdzeVKhaLWOzhQAjbAmFWzMzqxYJDwBChaezJXweO6uK2eXwmhGxmMXDwx5Hxy6Oe1PXrU530xhu1kYDm4bhSGuoVi1eqNFrtTrdUtUzgV11M9219n1xsyeSkXhjObaPTq6bh+aRyG7ONHZyOaFJgmBDwms3Hfz2Lz+HxQu4ljDPPo034uhnVj2jhlN9jqSgKATdq9lvt3yuMsyTZ1g2L7jqMLrqLOYZqqAizQjCASEgm7ikgEjjwiaUTEokziIimrjeOsSR5PkICkOgcDmA6N5lFIVQwXMEJLGiiG7EajhJoEriElhPGIQiqbnqkWhIa4l7CL2gjDO8AzKvOYJMcuCB4dijikisPExsk0JYQkNy4barEJGaKLWBJ17UnRYEsJgrYNPJhiKRGcHRBhxxmkcPgpLqSYIiaviOHGGxaC4mRJrqokWb+Tr-gOQEelyPIMnyAq+sojEuRqSyIhQqYJhcriEdGuzOJmGEUM4lwXM4KRoukJnRVJt50vFQ6oCBY4YJlS6uQgBquHGyJeAaZrWJxNzlR4cZ+HEhK2L4wTwk1jotfeVaDk2PXMVERKDVCRp6gaMbGhEkL6pVVW1XEaTrKkHgrX023KTEyIUJ5uzBLcOIeP5Z0sdY+3XIi6EbtG9jQqRORAA */
   createMachine(
     {
       context: {
@@ -15,6 +15,9 @@ export const todosMachine =
           loadTodos: {
             data: string[];
           };
+          saveTodo: {
+            data: void;
+          };
         },
         events: {} as
           | {
@@ -23,6 +26,9 @@ export const todosMachine =
           | {
               type: "Form input changed";
               value: string;
+            }
+          | {
+              type: "Submit";
             },
       },
       id: "Todo machine",
@@ -61,6 +67,25 @@ export const todosMachine =
                 "Form input changed": {
                   actions: "assignFormInputToContext",
                 },
+                Submit: {
+                  target: "Saving todo",
+                },
+              },
+            },
+            "Saving todo": {
+              invoke: {
+                src: "saveTodo",
+                onError: [
+                  {
+                    target: "Showing form input",
+                    actions: "assignErrorToContext",
+                  },
+                ],
+                onDone: [
+                  {
+                    target: "#Todo machine.Loading Todos",
+                  },
+                ],
               },
             },
           },

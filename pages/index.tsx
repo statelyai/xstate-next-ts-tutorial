@@ -1,15 +1,17 @@
 import { useMachine } from "@xstate/react";
 import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
-import { myMachine } from "../machines/myFirstMachine";
 import { todosMachine } from "../machines/todoAppMachine";
+
+const todos = new Set<string>(["Take bins out", "Do laundry"]);
 
 const Home: NextPage = () => {
   const [state, send] = useMachine(todosMachine, {
     services: {
       loadTodos: async () => {
-        return ["Take bins out", "Do laundry"];
+        return Array.from(todos);
+      },
+      saveTodo: async (context, event) => {
+        todos.add(context.createNewTodoFormInput);
       },
     },
   });
@@ -31,14 +33,23 @@ const Home: NextPage = () => {
           </button>
         )}
         {state.matches("Creating new todo.Showing form input") && (
-          <input
-            onChange={(e) => {
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
               send({
-                type: "Form input changed",
-                value: e.target.value,
+                type: "Submit",
               });
             }}
-          ></input>
+          >
+            <input
+              onChange={(e) => {
+                send({
+                  type: "Form input changed",
+                  value: e.target.value,
+                });
+              }}
+            ></input>
+          </form>
         )}
       </div>
     </div>
